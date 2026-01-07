@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: api-payments-deployment
 spec:
+  replicas: 1 
   selector:
     matchLabels:
       app: api-payments
@@ -14,52 +15,65 @@ spec:
       containers:
       - name: container-api-payments
         image: viniciusdelr/payments-service:latest 
-        imagePullPolicy: Always 
+        imagePullPolicy: Always
         ports:
-        - containerPort: 80 
+        - containerPort: 80
         resources:
           requests:
-            cpu: "100m"   # Reserva mínima (0.1 vCPU)
+            cpu: "100m"
             memory: "128Mi"
           limits:
-            cpu: "250m"   # Teto máximo (0.25 vCPU)
+            cpu: "250m"
             memory: "256Mi"
-
         env:
         - name: ASPNETCORE_ENVIRONMENT
           valueFrom:
             configMapKeyRef:
-              name: app-config  # Nome do arquivo ConfigMap que vamos criar
+              name: app-config
               key: ASPNETCORE_ENVIRONMENT
+        - name: ConnectionStrings__DefaultConnection
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: DatabaseConnection
+        - name: JwtSettings__SecretKey
+          valueFrom:              # <--- ISTO ESTAVA FALTANDO
+            secretKeyRef:
+              name: app-secrets
+              key: JwtSecret
 
-  apiVersion: v1
-  kind: Service
-  metadata:
-    name: servico-api-payments
-  spec:
-    type: ClusterIP 
-    selector:
-      app: api-payments
-    ports:
+--- 
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: servico-api-payments
+spec:
+  type: ClusterIP
+  selector:
+    app: api-payments
+  ports:
     - protocol: TCP
-      port: 80      
-      targetPort: 80 
+      port: 80
+      targetPort: 80
 
-  apiVersion: autoscaling/v2
-  kind: HorizontalPodAutoscaler
-  metadata:
-    name: hpa-api-payments
-  spec:
-    scaleTargetRef:
-      apiVersion: apps/v1
-      kind: Deployment
-      name: api-payments-deployment
-    minReplicas: 1  
-    maxReplicas: 10 
-    metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 70 
+--- 
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa-api-payments
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-payments-deployment
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
