@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: api-games-deployment
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: api-games
@@ -18,9 +17,20 @@ spec:
         imagePullPolicy: Always 
         ports:
         - containerPort: 80 
+        resources:
+          requests:
+            cpu: "100m"   # Reserva mínima (0.1 vCPU)
+            memory: "128Mi"
+          limits:
+            cpu: "250m"   # Teto máximo (0.25 vCPU)
+            memory: "256Mi"
+
         env:
         - name: ASPNETCORE_ENVIRONMENT
-          value: "Development"
+          valueFrom:
+            configMapKeyRef:
+              name: app-config 
+              key: ASPNETCORE_ENVIRONMENT
 ---
 apiVersion: v1
 kind: Service
@@ -34,3 +44,22 @@ spec:
   - protocol: TCP
     port: 80      
     targetPort: 80 
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa-api-games
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-games-deployment
+  minReplicas: 1  
+  maxReplicas: 10 
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70 
