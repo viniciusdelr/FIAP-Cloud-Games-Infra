@@ -31,6 +31,16 @@ spec:
             configMapKeyRef:
               name: app-config  # Nome do arquivo ConfigMap que vamos criar
               key: ASPNETCORE_ENVIRONMENT
+        - name: ConnectionStrings__DefaultConnection 
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: DatabaseConnection
+
+        - name: JwtSettings__SecretKey 
+            secretKeyRef:
+              name: app-secrets
+              key: JwtSecret
 ---
 apiVersion: v1
 kind: Service

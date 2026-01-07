@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config 
+data:
+  ASPNETCORE_ENVIRONMENT: "Development"
+  
+  USERS_SERVICE_URL: "http://servico-api-users:80"
+  GAMES_SERVICE_URL: "http://servico-api-games:80"
+  PAYMENTS_SERVICE_URL: "http://servico-api-payments:80"
