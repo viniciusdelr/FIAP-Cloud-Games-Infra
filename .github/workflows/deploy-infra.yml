@@ -1,0 +1,26 @@
+name: Deploy Infraestrutura
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy-k8s:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Set AKS Context
+      uses: azure/aks-set-context@v3
+      with:
+        resource-group: NOME_DO_SEU_RESOURCE_GROUP
+        cluster-name: NOME_DO_SEU_CLUSTER_AKS
+
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f k8s/ # Aplica tudo que estiver na pasta k8s
