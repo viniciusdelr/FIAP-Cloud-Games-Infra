@@ -41,35 +41,33 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: JwtSecret
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: servico-api-users
-spec:
-  type: ClusterIP 
-  selector:
-    app: api-users
-  ports:
-  - protocol: TCP
-    port: 80      
-    targetPort: 80 
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: hpa-api-users
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: api-users-deployment
-  minReplicas: 1  
-  maxReplicas: 10 
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70 
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: servico-api-users
+  spec:
+    type: ClusterIP 
+    selector:
+      app: api-users
+    ports:
+    - protocol: TCP
+      port: 80      
+      targetPort: 80 
+  apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    name: hpa-api-users
+  spec:
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: api-users-deployment
+    minReplicas: 1  
+    maxReplicas: 10 
+    metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70 
