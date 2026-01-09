@@ -41,6 +41,11 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: JwtSecret
+        - name: ConnectionStrings__ServiceBusConnection
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: ServiceBusConnection
 
 --- 
 
