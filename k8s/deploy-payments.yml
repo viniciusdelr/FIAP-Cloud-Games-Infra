@@ -37,7 +37,7 @@ spec:
               name: app-secrets
               key: DatabaseConnection
         - name: JwtSettings__SecretKey
-          valueFrom:              # <--- ISTO ESTAVA FALTANDO
+          valueFrom:            
             secretKeyRef:
               name: app-secrets
               key: JwtSecret
@@ -46,6 +46,11 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: ServiceBusConnection
+        - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: appInsightsConnection
 
 --- 
 

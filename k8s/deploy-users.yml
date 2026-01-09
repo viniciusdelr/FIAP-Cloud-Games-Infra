@@ -46,6 +46,11 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: ServiceBusConnection
+        - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: appInsightsConnection
 
 --- 
 
